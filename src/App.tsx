@@ -10,6 +10,7 @@ import Constants from './utils/constants.json';
 import { SignUp } from './components/pages/SignUp';
 import { DeviceList } from './components/pages/DeviceList';
 import { SignOut } from './components/pages/SignOut';
+import { MustAuth } from './components/wrappers/MustAuth';
 
 function CommonLayout() {
     return (
@@ -36,15 +37,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/devices',
-                element: <DeviceList />
+                element: <MustAuth><DeviceList /></MustAuth>
             },
             {
                 path: '/devices/:deviceId',
-                element: <DeviceInfo />
+                element: <MustAuth><DeviceInfo /></MustAuth>
             },
             {
                 path: '/sign-out',
-                element: <SignOut />
+                element: <MustAuth><SignOut /></MustAuth>
             }
         ]
     }
@@ -58,23 +59,31 @@ function usePrepareAuthContext() {
     // Put the important methods here so that no arbitrary child of the context can arbitrarily change the state/context data
     // I.e. only provide the relevant "setter" functions
     const refreshAuthContext = async () => {
-        const response = await fetch(Constants.BACKEND_BASE_URL + '/user', {
+        const uResponse = await fetch(Constants.BACKEND_BASE_URL + '/user', {
             credentials: 'include'
         });
-        // const result = await response.json();
-
-        if (!response.ok) {
+        if (!uResponse.ok) {
             // return result;
             setAuthData({
                 isAuthenticated: false
             });
             return;
         }
+        const uResult = await uResponse.json();
 
-        const result = await response.json();
+        const dResponse = await fetch(Constants.BACKEND_BASE_URL + '/device', {
+            credentials: 'include'
+        });
+        if (!dResponse.ok) {
+            window.alert('Error reading devices data!');
+            return;
+        }
+        const dResult = await dResponse.json();
+
         setAuthData({
             isAuthenticated: true,
-            username: result.data.email
+            username: uResult.data.email,
+            devices: dResult.data
         });
         // console.log(result);
     }
@@ -125,7 +134,8 @@ function usePrepareAuthContext() {
     const authContextValue = {
         data: authData,
         login,
-        logout
+        logout,
+        refreshAuthContext
     }
 
     const AuthProvider = ({ children }: PropsWithChildren) => (

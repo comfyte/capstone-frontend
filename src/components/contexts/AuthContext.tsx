@@ -4,7 +4,11 @@ export type AuthData = {
     isAuthenticated: false
 } | {
     isAuthenticated: true,
-    username: string
+    username: string,
+    devices: {
+        id_device: string,
+        name: string
+    }[]
 } | null;
 
 // `null` for when not initialized yet
@@ -12,9 +16,11 @@ export type AuthData = {
 export const AuthContext = createContext<{
     data: AuthData,
     login: (username: string, pw: string) => any,
-    logout: () => any
+    logout: () => any,
+    refreshAuthContext: () => any
 }>({
     data: null,
     login: () => {},
-    logout: () => {}
+    logout: () => {},
+    refreshAuthContext: () => {}
 });

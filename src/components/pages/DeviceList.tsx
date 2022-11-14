@@ -2,30 +2,20 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import Constants from '../../utils/constants.json';
+import { useAuth } from "../../utils/hooks/useAuth";
 import { FormInputGroup } from "../FormInputGroup";
 
 export function DeviceList() {
-    const [data, setData] = useState([]);
+    const { data, refreshAuthContext } = useAuth();
+
     const [isAddingNew, setAddingNew] = useState(false);
 
     const [deviceIdVal, setDeviceIdVal] = useState('');
     const [deviceNameVal, setDeviceNameVal] = useState('');
 
-    const refreshDeviceList = async () => {
-        const response = await fetch(Constants.BACKEND_BASE_URL + '/device', {
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            window.alert('Error!');
-            return;
-        }
-        const result = await response.json();
-        setData(result.data);
-    }
-
-    useEffect(() => {
-        refreshDeviceList();
-    }, []);
+    // useEffect(() => {
+    //     refreshAuthContext();
+    // }, []);
 
     const onAddNew = (ev: FormEvent) => {
         ev.preventDefault();
@@ -54,22 +44,29 @@ export function DeviceList() {
 
             setAddingNew(false);
 
-            refreshDeviceList();
+            refreshAuthContext();
         })();
     }
+
+    // Just a simple type guard to avoid typescript being whining too much
+    // Because this logic is already handled (supposedly?) in the routes definition
+    // (I.e. this particular component is wrapped by a MustAuth component)
+    // if (!data?.isAuthenticated) {
+    //     return;
+    // }
 
     return (
         <>
             <h1>Daftar perangkat</h1>
             <ul>
-                {data.map(({ id_device, name }) => (
+                {data?.isAuthenticated ? data.devices.map(({ id_device, name }) => (
                     <li key={id_device} className='block shadow-md first:rounded-t-lg'>
                         <Link to={`/devices/${id_device}`} className='block p-4'>
                             <p className='font-bold mb-1'>{name}</p>
                             <p>{id_device}</p>
                         </Link>
                     </li>
-                ))}
+                )) : 'Some unknown error happened in our end and we don\'t know why (?)'}
             </ul>
             <div className='block shadow-md rounded-b-lg'>
                 {isAddingNew ? (
