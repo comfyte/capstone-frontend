@@ -11,7 +11,7 @@ export function Header() {
                 <p>Portal Pemantauan</p>
             </div>
             <div>
-                {data?.isAuthenticated ? (
+                {!data ? 'Sedang memuat informasi akun...' : data.isAuthenticated ? (
                     <>
                         <p className='inline'>Anda sedang masuk sebagai <span className='font-bold mr-4'>{data.username}</span></p>
                         <Link to='/sign-out' className='hover:underline'>Keluar</Link>

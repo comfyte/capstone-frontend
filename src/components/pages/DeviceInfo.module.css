@@ -1,0 +1,6 @@
+.deviceStatus::before {
+    /* content: '';
+    display: block;
+    background-color: ; */
+    @apply block bg-current content-[''] rounded-full mr-1 w-2 h-2;
+}
