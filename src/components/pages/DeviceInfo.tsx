@@ -10,7 +10,7 @@ import { io } from 'socket.io-client';
 import Constants from '../../utils/constants.json';
 import { useAuth } from '../../utils/hooks/useAuth';
 
-import Styles from './DeviceInfo.module.css';
+import styles from './DeviceInfo.module.css';
 
 type DataProperties = {
     timestamp: number;
@@ -150,9 +150,9 @@ export function DeviceInfo() {
         const [text, classNames]: [ReactNode, string] = ((ds) => {
             switch (ds) {
                 case 'disconnected':
-                    return ['Tidak terhubung', 'bg-black/20 text-black']
+                    return ['Koneksi terputus', 'bg-black/20 text-black']
                 case 'connecting':
-                    return ['Sedang menyambungkan', ' bg-black/20 text-black'];
+                    return ['Sedang menyambungkan', ' bg-yellow-500/20 text-yellow-500'];
                 case 'connected':
                     return ['Terhubung', 'bg-green-500/20 text-green-500'];
                 case 'unknown':
@@ -161,7 +161,7 @@ export function DeviceInfo() {
         })(deviceStatus);
 
         return (
-            <div className={Styles.deviceStatus + ' flex items-center uppercase font-bold p-2 leading-none rounded-md text-sm ' + classNames}>
+            <div className={styles.deviceStatus + ' flex items-center uppercase font-bold p-2 leading-none rounded-md text-sm ' + classNames}>
                 {text}
             </div>
         )
@@ -223,7 +223,33 @@ export function DeviceInfo() {
                             <button disabled={currentLogPage <= 1} onClick={() => {setCurrentLogPage((prev) => --prev)}}>&larr;</button>
                             <div>
                                 <p>Halaman </p>
-                                <input type='number' min={1} max={logData.data.paginationInfo.total_page} value={currentLogPage} onChange={(ev) => {setCurrentLogPage(parseInt(ev.target.value))}} />
+                                <input
+                                    type='number'
+                                    min={1}
+                                    max={logData.data.paginationInfo.total_page}
+                                    value={currentLogPage}
+                                    onChange={(ev) => {
+                                        if (ev.target.value) {
+                                            const intValue = parseInt(ev.target.value);
+                                            // if (intValue >= ev.target.min && intValue <= ev.target.max) {}
+
+                                            const min = parseInt(ev.target.min);
+                                            const max = parseInt(ev.target.max);
+
+                                            if (intValue < min) {
+                                                setCurrentLogPage(min);
+                                                return;
+                                            }
+
+                                            if (intValue > max) {
+                                                setCurrentLogPage(max);
+                                                return;
+                                            }
+                                            
+                                            setCurrentLogPage(intValue);
+                                        }
+                                    }}
+                                />
                                 <p>dari {logData.data.paginationInfo.total_page} halaman</p>
                             </div>
                             <button disabled={currentLogPage >= logData.data.paginationInfo.total_page} onClick={() => {setCurrentLogPage((prev) => ++prev)}}>&rarr;</button>

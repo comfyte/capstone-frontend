@@ -13,12 +13,13 @@ export function Header() {
             <div>
                 {!data ? 'Sedang memuat informasi akun...' : data.isAuthenticated ? (
                     <>
-                        <p className='inline'>Anda sedang masuk sebagai <span className='font-bold mr-4'>{data.username}</span></p>
+                        <p className='inline'>Anda sedang masuk sebagai <span className='font-bold mr-6'>{data.username}</span></p>
+                        <Link to='/devices' className='hover:underline mr-6'>Perangkat Anda</Link>
                         <Link to='/sign-out' className='hover:underline'>Keluar</Link>
                     </>
                 ) : (
                     <>
-                        <Link to='/sign-up' className='hover:underline mr-4'>Daftar</Link>
+                        <Link to='/sign-up' className='hover:underline mr-6'>Daftar</Link>
                         <Link to='/' className='hover:underline'>Masuk</Link>
                     </>
                 )}
