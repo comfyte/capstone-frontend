@@ -1,6 +1,7 @@
 .deviceStatus::before {
-    /* content: '';
-    display: block;
-    background-color: ; */
     @apply block bg-current content-[''] rounded-full mr-1 w-2 h-2;
+}
+
+th, td {
+    @apply py-2 px-4 mr-2 border-r-2 border-white;
 }

@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "../../utils/hooks/useAuth";
-import reportWebVitals from "../../utils/reportWebVitals";
 import { FormInputGroup } from "../FormInputGroup";
 
 import Constants from '../../utils/constants.json';
@@ -10,8 +9,6 @@ export function SignUp() {
     const [passwordVal, setPasswordVal] = useState('');
     const [repeatPasswordVal, setRepeatPasswordVal] = useState('');
 
-    // const [doesPasswordMatch, setPasswordMatch]
-    // const [isPasswordsSame]
     const [passwordMatchStatus, setPasswordMatchStatus] = useState(false);
 
     const [isLoading, setLoading] = useState(false);
@@ -43,7 +40,6 @@ export function SignUp() {
             const result = await response.json();
             if (!response.ok) {
                 window.alert(result.message);
-                // ReadableStreamDefaultController;
                 setLoading(false);
                 return;
             }

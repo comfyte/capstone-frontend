@@ -1,7 +1,6 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 
-import Constants from '../../utils/constants.json';
 import { useAuth } from "../../utils/hooks/useAuth";
 
 export function SignOut() {
@@ -10,18 +9,6 @@ export function SignOut() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // (async () => {
-        //     const response = await fetch(Constants.BACKEND_BASE_URL + '/logout', {
-        //         method: 'POST'
-        //     });
-
-        //     if (!response.ok) {
-        //         window.alert('Proses sign-out gagal!');
-        //         return;
-        //     }
-
-        //     navigate('/');
-        // })();
         (async () => {
             await logout();
             navigate('/');

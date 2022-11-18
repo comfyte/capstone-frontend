@@ -1,10 +1,5 @@
-// TODO: Cause the component/pagecomponent to check for existence of the device in the userInfo(?)
-// context first before preoceeding/proceeding. If not exists, dump the user back to the devices
-// screen (or, in case of haven't been logged in, dump right back into the login/authgate screen).
-
-// import { constants } from 'buffer';
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 import Constants from '../../utils/constants.json';
@@ -19,12 +14,12 @@ type DataProperties = {
     power: number;
 }
 
-const DataProperty = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+const DataProperty = ({ title, children, unitSuffix }: PropsWithChildren<{ title: string, unitSuffix?: string }>) => {
     return (
         <p>
             <span className='block text-sm text-gray-600 mb-1'>{title}</span>
             <span className='sr-only'>: </span>
-            <span className='block text-xl font-semibold'>{children || '-'}</span>
+            <span className='block text-xl font-semibold'>{children || '-'}{children && unitSuffix && (' ' + unitSuffix)}</span>
         </p>
     );
 }
@@ -34,12 +29,10 @@ export function DeviceInfo() {
     const { deviceId } = useParams();
     const navigate = useNavigate();
 
-    // const [adata, setData] = useState(null);
     const [realTimeData, setRealTimeData] = useState<DataProperties | null>(null);
     const [deviceStatus, setDeviceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'unknown'>('disconnected');
 
     const [logData, setLogData] = useState<{
-        // success: ConstrainBooleanParameters,
         success: boolean,
         data: {
             items: DataProperties[],
@@ -65,15 +58,10 @@ export function DeviceInfo() {
         }, updateRate);
     }, [updateRate]);
 
-    // const deviceData = useRef() || null);
-    // const [deviceData, setDeviceData] = useState();
-
     // TODO: Find out why it still pops out the alert box twice
     // The real-time part (powered by socket.io)
     // One-time-called useEffect callback function
     useEffect(() => {
-        // setDeviceData() here?
-        // if (!deviceId || !(deviceData.current)) {
             if (!deviceId || !(userData?.isAuthenticated && userData.devices.find((item) => item.id_device === deviceId))) {
             window.alert('You\'re not authorized to access this page');
             navigate('/devices');
@@ -82,16 +70,11 @@ export function DeviceInfo() {
 
         setDeviceStatus('connecting');
 
-        // Get initial datas
-
-        // FIXME: Turn this into a Ref later instead?
         const socket = io(Constants.BACKEND_BASE_URL, {
             query: { deviceId }
         });
 
         socket.on('connect', () => {
-            // console.log('terkoneksi dengan perangkat.');
-            // TODO: Put the device status here
             setDeviceStatus('connected');
         });
 
@@ -119,7 +102,6 @@ export function DeviceInfo() {
             if (!response.ok) {
                 window.alert('Terjadi sebuah kesalahan! Mohon maaf atas ketidaknyamanan Anda.');
                 navigate('/devices');
-                // ReadableStreamDefaultController;
                 return;
             }
 
@@ -135,18 +117,7 @@ export function DeviceInfo() {
     }, [realTimeData]);
     // do we need to also include currentLogPage here in the dependencies list?
 
-    // if (!(deviceData.current)) {
-    //     window.alert('Terjadi sebuah kesalahan!');
-    //     return null;
-    // }
-
-    const DeviceConnectionStatus = () => {
-        // switch (deviceStatus) {
-        //     case 'disconnected':
-        //         return ()
-        // }
-        // const 
-    
+    const DeviceConnectionStatus = () => {    
         const [text, classNames]: [ReactNode, string] = ((ds) => {
             switch (ds) {
                 case 'disconnected':
@@ -170,6 +141,9 @@ export function DeviceInfo() {
 
     return (
         <>
+            <div className='mb-6'>
+                <Link to='/devices' className='block w-fit text-blue-700 hover:underline'>&larr; Kembali ke daftar perangkat</Link>
+            </div>
             <div className='mb-8'>
                 {/* <h1>{deviceData.current.name}</h1> */}
                 <div className='flex justify-between items-center mb-8'>
@@ -185,10 +159,10 @@ export function DeviceInfo() {
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-rows-none gap-8'>
                     <DataProperty title='ID perangkat'>{deviceId}</DataProperty>
-                    <DataProperty title='Waktu terakhir diperbarui'>{realTimeData && new Date(realTimeData.timestamp).toString()}</DataProperty>
-                    <DataProperty title='Arus'>{realTimeData?.current}</DataProperty>
-                    <DataProperty title='Daya'>{realTimeData?.power}</DataProperty>
-                    <DataProperty title='Voltase'>{realTimeData?.voltage}</DataProperty>
+                    <DataProperty title='Waktu terakhir diperbarui'>{realTimeData && new Date(realTimeData.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'long' })}</DataProperty>
+                    <DataProperty title='Arus' unitSuffix='A'>{realTimeData?.current}</DataProperty>
+                    <DataProperty title='Daya' unitSuffix='W'>{realTimeData?.power}</DataProperty>
+                    <DataProperty title='Voltase' unitSuffix='V'>{realTimeData?.voltage}</DataProperty>
                 </div>
             </div>
             <div>
@@ -197,31 +171,30 @@ export function DeviceInfo() {
                     <>
                         <table className='table-fixed w-full'>
                             <thead>
-                                <tr>
-                                    <th>Waktu</th>
+                                <tr className='bg-gray-200'>
+                                    <th className='rounded-tl-lg'>Waktu</th>
                                     <th>Arus</th>
                                     <th>Daya</th>
-                                    <th>Voltase</th>
+                                    <th className='rounded-tr-lg'>Voltase</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {logData.data.items.map(({ timestamp, current, power, voltage }) => (
-                                    <tr key={timestamp}>
-                                        <td>{(() => {
+                                    <tr key={timestamp} className='even:bg-gray-200 odd:bg-gray-100 group'>
+                                        <td className='group-last:rounded-bl-lg'>{(() => {
                                             const date = new Date(timestamp);
-                                            return date.toString();
+                                            return date.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'long' })
                                         })()}</td>
                                         <td>{current} A</td>
-                                        <td>{power} (satuan?)</td>
-                                        <td>{voltage} V</td>
+                                        <td>{power} W</td>
+                                        <td className='group-last:rounded-br-lg'>{voltage} V</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                        <div>
-                            <p>Pilih halaman:</p>
-                            <button disabled={currentLogPage <= 1} onClick={() => {setCurrentLogPage((prev) => --prev)}}>&larr;</button>
-                            <div>
+                        <div className='flex w-fit mx-auto items-center mt-4'>
+                            <button disabled={currentLogPage <= 1} onClick={() => {setCurrentLogPage((prev) => --prev)}} className='text-blue-700 hover:underline text-xl mr-4'>&larr;</button>
+                            <div className='flex items-center'>
                                 <p>Halaman </p>
                                 <input
                                     type='number'
@@ -231,7 +204,6 @@ export function DeviceInfo() {
                                     onChange={(ev) => {
                                         if (ev.target.value) {
                                             const intValue = parseInt(ev.target.value);
-                                            // if (intValue >= ev.target.min && intValue <= ev.target.max) {}
 
                                             const min = parseInt(ev.target.min);
                                             const max = parseInt(ev.target.max);
@@ -249,10 +221,12 @@ export function DeviceInfo() {
                                             setCurrentLogPage(intValue);
                                         }
                                     }}
+                                    className='block mx-2 text-center p-1'
+                                    size={4}
                                 />
                                 <p>dari {logData.data.paginationInfo.total_page} halaman</p>
                             </div>
-                            <button disabled={currentLogPage >= logData.data.paginationInfo.total_page} onClick={() => {setCurrentLogPage((prev) => ++prev)}}>&rarr;</button>
+                            <button disabled={currentLogPage >= logData.data.paginationInfo.total_page} onClick={() => {setCurrentLogPage((prev) => ++prev)}} className='text-blue-700 hover:underline text-xl ml-4'>&rarr;</button>
                         </div>
                     </>
                 ) : <p className='font-italic'>Sedang memuat riwayat pemantauan untuk perangkat ini...</p>}

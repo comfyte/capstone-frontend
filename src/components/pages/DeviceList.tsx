@@ -5,8 +5,6 @@ import Constants from '../../utils/constants.json';
 import { useAuth } from "../../utils/hooks/useAuth";
 import { FormInputGroup } from "../FormInputGroup";
 
-// import Constants from '../../utils/constants.json';
-
 // For id-ID region
 // Logic is from big to small
 function relativeTime(msOfDifference: number, advance: number = 0): string {
@@ -36,20 +34,12 @@ function relativeTime(msOfDifference: number, advance: number = 0): string {
 
 export function DeviceList() {
     const { data, refreshAuthContext } = useAuth();
-    // const [additionalData, setAdditionalData] = useState<{
-    //     deviceId: string,
-    //     lastActiveTime: string | null
-    // }[] | null>(null);
     const [lastActiveData, setLastActiveData] = useState<{ [key: string]: string | null } | null>(null);
 
     const [isAddingNew, setAddingNew] = useState(false);
 
     const [deviceIdVal, setDeviceIdVal] = useState('');
     const [deviceNameVal, setDeviceNameVal] = useState('');
-
-    // useEffect(() => {
-    //     refreshAuthContext();
-    // }, []);
 
     useEffect(() => {
         if (!(data?.isAuthenticated)) {
@@ -58,14 +48,9 @@ export function DeviceList() {
             setLastActiveData(null);
             return;
         }
-        // make a const of an blank/emptya rray first?
-
-        // for (const { id_device } of data.devices) {}
 
         (async () => {
             for (const { id_device } of data.devices) {
-                // const lastUpdate
-                // const lastActiveTime = 
                 const response = await fetch(`${Constants.BACKEND_BASE_URL}/ruangan/${id_device}?volume=1&page=1`, {
                     credentials: 'include'
                 });
@@ -73,29 +58,10 @@ export function DeviceList() {
                     continue;
                 }
                 const jsonResult = await response.json();
-                // setAdditionalData((previousData) => [
-                //     ...(previousData ?? []),
-                // ]);
-                // setLastActiveData((previousData) => [
-                //     // ...(previousData ?? [])
-                //     previousData ? ...previousData : ''
-                // ]);
-                // setLastActiveData((previousData) => {
-                //     // previousData[]
-                //     const newData = previousData ?? [];
-                //     newData[id_device] = jsonResult.data.items[0]
-                // })
                 setLastActiveData((previousData) => ({
                     ...previousData,
-                    // [id_device]: new Intl.RelativeTimeFormat('en-US').format(new Date(Date.now() - jsonResult.data.items[0].timestamp).getHours(), 'hours')
                     [id_device]: relativeTime(Date.now() - jsonResult.data.items[0].timestamp)
                 }));
-                // HTMLFormControlsCollectio
-                // console.log(Date.now());
-                // console.log(typeof jsonResult.data.items[0].timestamp);
-                // console.log(jsonResult.data.items[0].timestamp);
-                // console.log('abcdef', new Date(jsonResult.data.items[0].timestamp).getMilliseconds());
-                // console.log(Date.now() - jsonResult.data.items[0].timestamp);
             }
         })();
     }, [data]);
@@ -124,19 +90,10 @@ export function DeviceList() {
             // Reset those textbox values back to a blank string
             setDeviceIdVal('');
             setDeviceNameVal('');
-
             setAddingNew(false);
-
             refreshAuthContext();
         })();
     }
-
-    // Just a simple type guard to avoid typescript being whining too much
-    // Because this logic is already handled (supposedly?) in the routes definition
-    // (I.e. this particular component is wrapped by a MustAuth component)
-    // if (!data?.isAuthenticated) {
-    //     return;
-    // }
 
     return (
         <>
@@ -149,7 +106,6 @@ export function DeviceList() {
                                 <p className='font-bold mb-1'>{name}</p>
                                 <p>{id_device}</p>
                             </div>
-                            {/* <p>{lastActiveData}</p> */}
                             <p className='text-xs italic opacity-50'>
                                 {lastActiveData?.[id_device] ? `Terakhir aktif ${lastActiveData[id_device]}` : ''}
                             </p>

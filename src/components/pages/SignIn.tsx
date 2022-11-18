@@ -1,4 +1,4 @@
-import { FormEvent, HTMLInputTypeAttribute, InputHTMLAttributes, PropsWithChildren, ReactNode, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuth } from "../../utils/hooks/useAuth";
 import { FormInputGroup } from "../FormInputGroup";
 
@@ -44,8 +44,6 @@ export function SignIn() {
                     onChange={(ev) => {setPasswordVal(ev.target.value)}}
                     required
                     disabled={isLoading}
-                    // className='mb-8'
-                    // type='password'
                 />
                 <button type='submit' className='button w-full mt-8' disabled={isLoading}>{!isLoading ? 'Masuk' : 'Sedang masuk...'}</button>
             </form>

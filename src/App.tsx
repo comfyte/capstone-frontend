@@ -63,7 +63,6 @@ function usePrepareAuthContext() {
             credentials: 'include'
         });
         if (!uResponse.ok) {
-            // return result;
             setAuthData({
                 isAuthenticated: false
             });
@@ -85,7 +84,6 @@ function usePrepareAuthContext() {
             username: uResult.data.email,
             devices: dResult.data
         });
-        // console.log(result);
     }
 
     const login = async (username: string, password: string) => {
@@ -121,9 +119,6 @@ function usePrepareAuthContext() {
             return;
         }
 
-        // setAuthData({
-        //     isAuthenticated: false
-        // });
         refreshAuthContext();
     }
 
@@ -147,7 +142,7 @@ function usePrepareAuthContext() {
     return { AuthProvider }; // FIXME: Add the other required/necessary values?
 }
 
-function App() {
+export default function App() {
     const { AuthProvider } = usePrepareAuthContext();
 
     return (
@@ -156,5 +151,3 @@ function App() {
         </AuthProvider>
     );
 }
-
-export default App;
