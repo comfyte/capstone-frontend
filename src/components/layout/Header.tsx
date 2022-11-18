@@ -3,7 +3,6 @@ import { useAuth } from "../../utils/hooks/useAuth";
 
 export function Header() {
     const { data } = useAuth();
-    console.log(data);
 
     return (
         <header className='flex justify-between mx-3 mb-4'>

@@ -78,10 +78,7 @@ export function DeviceInfo() {
             setDeviceStatus('connected');
         });
 
-        socket.on('dataMasuk', (data) => {
-            console.log(data);
-            setRealTimeData(data);
-        });
+        socket.on('dataMasuk', setRealTimeData);
 
         socket.on('disconnect', () => {
             setDeviceStatus('disconnected');
