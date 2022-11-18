@@ -7,6 +7,33 @@ import { FormInputGroup } from "../FormInputGroup";
 
 // import Constants from '../../utils/constants.json';
 
+// For id-ID region
+// Logic is from big to small
+function relativeTime(msOfDifference: number, advance: number = 0): string {
+    const orderOfMultipliers = [1000, 60, 60, 24];
+    const unitStrings = ['detik', 'menit', 'jam', 'hari'];
+
+    // Just some basic type guarding/checking
+    if (orderOfMultipliers.length !== unitStrings.length) {
+        throw new ReferenceError();
+    }
+
+    for (let i = 0; i < advance; ++i) {
+        orderOfMultipliers.pop();
+        unitStrings.pop();
+    }
+
+    const divisor = orderOfMultipliers.reduce((prevVal, curVal) => prevVal * curVal);
+
+    if (msOfDifference < divisor) {
+        if (orderOfMultipliers.length <= 1) {
+            return 'baru saja';
+        }
+        return relativeTime(msOfDifference, ++advance);
+    }
+    return `${Math.floor(msOfDifference / divisor)} ${unitStrings[unitStrings.length - 1]} yang lalu`
+}
+
 export function DeviceList() {
     const { data, refreshAuthContext } = useAuth();
     // const [additionalData, setAdditionalData] = useState<{
@@ -60,8 +87,15 @@ export function DeviceList() {
                 // })
                 setLastActiveData((previousData) => ({
                     ...previousData,
-                    [id_device]: new Date(jsonResult.data.items[0].timestamp).toString()
+                    // [id_device]: new Intl.RelativeTimeFormat('en-US').format(new Date(Date.now() - jsonResult.data.items[0].timestamp).getHours(), 'hours')
+                    [id_device]: relativeTime(Date.now() - jsonResult.data.items[0].timestamp)
                 }));
+                // HTMLFormControlsCollectio
+                // console.log(Date.now());
+                // console.log(typeof jsonResult.data.items[0].timestamp);
+                // console.log(jsonResult.data.items[0].timestamp);
+                // console.log('abcdef', new Date(jsonResult.data.items[0].timestamp).getMilliseconds());
+                // console.log(Date.now() - jsonResult.data.items[0].timestamp);
             }
         })();
     }, [data]);
@@ -117,7 +151,7 @@ export function DeviceList() {
                             </div>
                             {/* <p>{lastActiveData}</p> */}
                             <p className='text-xs italic opacity-50'>
-                                {lastActiveData?.[id_device] ? `Terakhir aktif pada ${lastActiveData[id_device]}` : ''}
+                                {lastActiveData?.[id_device] ? `Terakhir aktif ${lastActiveData[id_device]}` : ''}
                             </p>
                         </Link>
                     </li>
