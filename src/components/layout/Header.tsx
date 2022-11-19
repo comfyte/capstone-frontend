@@ -5,15 +5,15 @@ export function Header() {
     const { data } = useAuth();
 
     return (
-        <header className='flex justify-between mx-3 mb-4'>
+        <header className='flex justify-between mx-3 mb-4 font-light'>
             <div>
                 <p>Portal Pemantauan</p>
             </div>
             <div>
                 {!data ? 'Sedang memuat informasi akun...' : data.isAuthenticated ? (
                     <>
-                        <p className='inline'>Anda sedang masuk sebagai <span className='font-bold mr-6'>{data.username}</span></p>
-                        <Link to='/devices' className='hover:underline mr-6'>Perangkat Anda</Link>
+                        <p className='inline font-bold mr-6'>{data.username}</p>
+                        <Link to='/devices' className='hover:underline mr-6'>Daftar Perangkat</Link>
                         <Link to='/sign-out' className='hover:underline'>Keluar</Link>
                     </>
                 ) : (

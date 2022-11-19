@@ -1,11 +1,42 @@
-import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 import Constants from '../../utils/constants.json';
 import { useAuth } from '../../utils/hooks/useAuth';
 
+import { Line as LineChart } from 'react-chartjs-2';
+import 'chart.js/auto';
+// import { Chart as ChartJS, TimeSeriesScale, LinearScale, PointElement, LineElement, Legend, Colors, Filler } from 'chart.js';
+import 'chartjs-adapter-luxon';
+
+// import {
+//     Chart as ChartJS,
+//     CategoryScale,
+//     LinearScale,
+//     PointElement,
+//     LineElement,
+//     Title,
+//     Tooltip,
+//     Legend,
+//     TimeSeriesScale
+//   } from 'chart.js';
+  
+
 import styles from './DeviceInfo.module.css';
+import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
+
+// ChartJS.register(
+//     CategoryScale,
+//     LinearScale,
+//     PointElement,
+//     LineElement,
+//     Title,
+//     Tooltip,
+//     Legend,
+//     TimeSeriesScale
+//   );  
+// ChartJS.register(TimeSeriesScale, LinearScale, PointElement, LineElement, Legend, Colors);
 
 type DataProperties = {
     timestamp: number;
@@ -62,7 +93,8 @@ export function DeviceInfo() {
     // The real-time part (powered by socket.io)
     // One-time-called useEffect callback function
     useEffect(() => {
-            if (!deviceId || !(userData?.isAuthenticated && userData.devices.find((item) => item.id_device === deviceId))) {
+        if (!deviceId || !(userData?.isAuthenticated && userData.devices.find((item) => item.id_device === deviceId))) {
+            // console.log(userData);
             window.alert('You\'re not authorized to access this page');
             navigate('/devices');
             return;
@@ -129,20 +161,29 @@ export function DeviceInfo() {
         })(deviceStatus);
 
         return (
-            <div className={styles.deviceStatus + ' flex items-center uppercase font-bold p-2 leading-none rounded-md text-sm ' + classNames}>
+            <div className={styles.deviceStatus + ' flex items-center uppercase font-bold p-2 leading-none rounded-md text-sm ' + classNames} title='Status koneksi dengan WebSocket'>
                 {text}
             </div>
         )
     }
-    
+
+    // const stubRefForPreventingChartCrash = useRef();
+    // const chartRef = useRef<ChartJSOrUndefined<'line'>>();
+    // useLayoutEffect(() => {
+    //     console.log(chartRef.current)
+
+    //     return () => {
+    //         // <chartRef className="c"></chartRef>
+    //         chartRef.current?.destroy();
+    //     }
+    // }, []);
 
     return (
         <>
             <div className='mb-6'>
                 <Link to='/devices' className='block w-fit text-blue-700 hover:underline'>&larr; Kembali ke daftar perangkat</Link>
             </div>
-            <div className='mb-8'>
-                {/* <h1>{deviceData.current.name}</h1> */}
+            <section className='mb-8'>
                 <div className='flex justify-between items-center mb-8'>
                     <div className='flex items-center'>
                         <h1 className='mb-0 mr-4'>{userData ? (userData.isAuthenticated && userData.devices.find((item) => item.id_device === deviceId)?.name) : 'Memuat...'}</h1>
@@ -156,13 +197,50 @@ export function DeviceInfo() {
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-rows-none gap-8'>
                     <DataProperty title='ID perangkat'>{deviceId}</DataProperty>
-                    <DataProperty title='Waktu terakhir diperbarui'>{realTimeData && new Date(realTimeData.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'long' })}</DataProperty>
+                    <DataProperty title='Waktu pembaruan'>{realTimeData && new Date(realTimeData.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'long' })}</DataProperty>
                     <DataProperty title='Arus' unitSuffix='A'>{realTimeData?.current}</DataProperty>
                     <DataProperty title='Daya' unitSuffix='W'>{realTimeData?.power}</DataProperty>
                     <DataProperty title='Voltase' unitSuffix='V'>{realTimeData?.voltage}</DataProperty>
                 </div>
-            </div>
-            <div>
+            </section>
+            <section className='mb-8'>
+                <h2>Diagram</h2>
+                {!logData ? 'Memuat grafik...' : (
+                    <div className='h-96 bg-gray-100 rounded-lg p-3'>
+                        <LineChart options={{
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    title: {
+                                        display: true,
+                                        text: 'Waktu'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Daya (dalam satuan Watt)'
+                                    }
+                                }
+                            },
+                            maintainAspectRatio: false,
+                        }} data={{
+                            datasets: [{
+                                label: `Penggunaan daya pada AC (halaman ${logData.data.paginationInfo.current_page} dari ${logData.data.paginationInfo.total_page} halaman)`,
+                                data: logData.data.items.map(({ timestamp, power }) => ({
+                                    x: timestamp,
+                                    y: power
+                                })),
+                                pointBorderColor: '#3b82f6',
+                                pointBackgroundColor: '#3b82f6',
+                                borderColor: '#60a5fa',
+                                backgroundColor: '#60a5fa'
+                            }]
+                        }} />
+                    </div>
+                )}
+            </section>
+            <section>
                 <h2>Riwayat Pemantauan</h2>
                 {logData ? (
                     <>
@@ -227,7 +305,7 @@ export function DeviceInfo() {
                         </div>
                     </>
                 ) : <p className='font-italic'>Sedang memuat riwayat pemantauan untuk perangkat ini...</p>}
-            </div>
+            </section>
         </>
     );
 }

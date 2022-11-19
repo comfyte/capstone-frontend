@@ -95,13 +95,15 @@ export function DeviceList() {
         })();
     }
 
+    const entryCommonClassNames = 'block bg-black bg-opacity-5';
+
     return (
         <>
             <h1>Daftar perangkat</h1>
             <ul className='peer'>
                 {data?.isAuthenticated ? data.devices.map(({ id_device, name }) => (
-                    <li key={id_device} className='block first:rounded-t-lg bg-black bg-opacity-5 hover:bg-opacity-10 mb-1'>
-                        <Link to={`/devices/${id_device}`} className='flex justify-between items-center p-4'>
+                    <li key={id_device} className={entryCommonClassNames + ' first:rounded-t-lg mb-1 hover:bg-opacity-10 active:bg-opacity-[0.2]'}>
+                        <Link to={`/devices/${id_device}`} className='flex justify-between items-center p-4 cursor-default'>
                             <div className='flex-shrink-0'>
                                 <p className='font-bold mb-1'>{name}</p>
                                 <p>{id_device}</p>
@@ -113,7 +115,7 @@ export function DeviceList() {
                     </li>
                 )) : 'Some unknown error happened in our end and we don\'t know why (?)'}
             </ul>
-            <div className='block rounded-b-lg peer-empty:rounded-t-lg bg-black bg-opacity-5 hover:bg-opacity-10'>
+            <div className={entryCommonClassNames + ' rounded-b-lg peer-empty:rounded-t-lg ' + (isAddingNew ? '' : 'hover:bg-opacity-10 active:bg-opacity-[0.2]')}>
                 {isAddingNew ? (
                     <form className='flex justify-between items-center p-4' onSubmit={onAddNew}>
                         <div className='flex'>
@@ -147,7 +149,7 @@ export function DeviceList() {
                         </div>
                     </form>
                 ) : (
-                    <button className='p-4 block w-full text-left' onClick={() => {setAddingNew(true)}}>
+                    <button className='p-4 block w-full text-left cursor-default' onClick={() => {setAddingNew(true)}}>
                         <span role='presentation'>+ </span>Tambah perangkat baru...
                     </button>
                 )}

@@ -48,6 +48,14 @@
         @apply opacity-50 !cursor-not-allowed;
     }
 
+    /* * {
+        @apply cursor-default;
+    } */
+
+    h1, h2, h3, p, div {
+        @apply cursor-default;
+    }
+
     /* FOR DEVELOPMENT PURPOSES ONLY */
     /* *, :before, :after {
         outline: 1px solid rgb(255 0 0 / 0.5);
