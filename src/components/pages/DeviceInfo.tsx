@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
@@ -7,36 +7,9 @@ import { useAuth } from '../../utils/hooks/useAuth';
 
 import { Line as LineChart } from 'react-chartjs-2';
 import 'chart.js/auto';
-// import { Chart as ChartJS, TimeSeriesScale, LinearScale, PointElement, LineElement, Legend, Colors, Filler } from 'chart.js';
 import 'chartjs-adapter-luxon';
 
-// import {
-//     Chart as ChartJS,
-//     CategoryScale,
-//     LinearScale,
-//     PointElement,
-//     LineElement,
-//     Title,
-//     Tooltip,
-//     Legend,
-//     TimeSeriesScale
-//   } from 'chart.js';
-  
-
 import styles from './DeviceInfo.module.css';
-import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
-
-// ChartJS.register(
-//     CategoryScale,
-//     LinearScale,
-//     PointElement,
-//     LineElement,
-//     Title,
-//     Tooltip,
-//     Legend,
-//     TimeSeriesScale
-//   );  
-// ChartJS.register(TimeSeriesScale, LinearScale, PointElement, LineElement, Legend, Colors);
 
 type DataProperties = {
     timestamp: number;
@@ -89,12 +62,8 @@ export function DeviceInfo() {
         }, updateRate);
     }, [updateRate]);
 
-    // TODO: Find out why it still pops out the alert box twice
-    // The real-time part (powered by socket.io)
-    // One-time-called useEffect callback function
     useEffect(() => {
         if (!deviceId || !(userData?.isAuthenticated && userData.devices.find((item) => item.id_device === deviceId))) {
-            // console.log(userData);
             window.alert('You\'re not authorized to access this page');
             navigate('/devices');
             return;
@@ -166,17 +135,6 @@ export function DeviceInfo() {
             </div>
         )
     }
-
-    // const stubRefForPreventingChartCrash = useRef();
-    // const chartRef = useRef<ChartJSOrUndefined<'line'>>();
-    // useLayoutEffect(() => {
-    //     console.log(chartRef.current)
-
-    //     return () => {
-    //         // <chartRef className="c"></chartRef>
-    //         chartRef.current?.destroy();
-    //     }
-    // }, []);
 
     return (
         <>

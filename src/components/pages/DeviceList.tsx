@@ -43,8 +43,6 @@ export function DeviceList() {
 
     useEffect(() => {
         if (!(data?.isAuthenticated)) {
-            // setAddingNew
-            // setAdditionalData(null);
             setLastActiveData(null);
             return;
         }
