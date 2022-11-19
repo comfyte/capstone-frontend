@@ -7,9 +7,12 @@ import { useAuth } from '../../utils/hooks/useAuth';
 
 import { Line as LineChart } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { defaults as chartjsDefaults } from 'chart.js';
 import 'chartjs-adapter-luxon';
 
 import styles from './DeviceInfo.module.css';
+
+chartjsDefaults.font.family = 'Inter, system-ui, sans-serif'; // match the Tailwind config
 
 type DataProperties = {
     timestamp: number;
